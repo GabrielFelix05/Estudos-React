@@ -1,34 +1,36 @@
-import React, {useState, useEffect} from 'react'
-import './styles.css'
-import { Link } from 'react-router-dom'
+import React, {useState} from "react";
+import firebase from '../../Firebase'
 
-function Home() {
-  const[data, setData] = useState([])
+export default function Home(){
+    const[titulo, setTitulo] = useState('')
+    const[autor, setAutor] = useState('')
 
-  useEffect(() => {
-    function api(){
-      let url = "https://sujeitoprogramador.com/r-api/?api=filmes/"
-      fetch(url)
-      .then((r) => r.json())
-      .then((json) => {
-        setData(json)
-      })
+    async function handleAdd(){
+        await firebase.firestore().collection("posts")
+        .doc('12345')
+        .set({
+            titulo: titulo, 
+            Autor: autor
+        })
+        .then(() => {
+            console.log("Dados cadastrados com sucesso!")
+        })
+        .catch((error) => {
+            console.log("Gerou algum erro!" + error)
+        })
     }
-    api()
-  }, [])
-  return (   
-    <div className="containerHome">  
-        {
-          data.map((item) => (
-            <div key={item.id} className="containerData">
-              <strong>{item.nome}</strong>
-              <img src={item.foto} alt={item.nome}/>
-              <Link to={`/${item.id}`}>Acessar</Link>
-            </div>
-          ))
-        }
-    </div>
-  )
-}
 
-export default Home;
+    return(
+        <div>
+            <h1>Firebase</h1><br/>
+
+            <label>Titulo:</label>
+            <textarea type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)}/>
+
+            <label>Autor:</label>
+            <input type="text" value={autor} onChange={(e) => setAutor(e.target.value)}/>
+
+            <button onClick={handleAdd}>Cadastrar</button>
+        </div>   
+    )
+}
