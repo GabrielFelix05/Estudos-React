@@ -1,27 +1,41 @@
-import React, {useState} from 'react'
+import React, { useEffect, useState } from 'react'
+import './styles.css'
 
 function App() {
-  const [tarefas, setTarefas] = useState([
-    'paragas a conta',
-    'estudar react hooks'
-  ])
+  const [nutri, setNutri] = useState([])
 
-  const [input, setInput] = useState()
+  useEffect(() => {
 
-  function handleAdd() {
-    setTarefas([...tarefas, input])
-  }
+    function loadAPI() {
+      let url = "https://sujeitoprogramador.com/rn-api/?api=posts"
+      fetch(url)
+      .then((r) => r.json())
+      .then((json) => {
+        setNutri(json)
+      })
+    }
+
+    loadAPI()
+  },[])
 
   return (   
-    <div>
-      <ul>
-        {tarefas.map(tarefa => (
-          <li key={tarefa}>{tarefa}</li>
-        ))}
-      </ul>
+    <div className='container'>
+        <header>
+          <strong>React Nutri</strong>
+        </header>
 
-      <input type="text" value={input} onChange={(e) => setInput(e.target.value)}/>
-      <button type='button' onClick={handleAdd}>Adicionar</button>
+          {nutri.map((item) => (
+      
+            <article key={item.id} className="post">
+              <strong className='titulo'>{item.titulo}</strong>
+              <img src={item.capa} alt={item.titulo} className="capa"/>
+              <p className='subtitulo'>
+                {item.subtitulo}
+              </p>
+              <a className='botao'>Acessar</a>
+            </article>
+          
+          ))}
     </div>
   )
 }
