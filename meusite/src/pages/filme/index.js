@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import api from '../../services/API'
 
 import './styles.css'
 
 function Filme() {
     const { id } = useParams()
+    let history = useHistory()
+
     const [filme, setFilme] = useState()
     const [loading, setLoading] = useState(true)
 
@@ -23,6 +25,7 @@ function Filme() {
             })
             .catch(() => {
                 console.log("Fime não encontrado")
+                history.push("/")
             })
         }
 
@@ -31,7 +34,22 @@ function Filme() {
         return () => {
             console.log("Componente foi desmontado!")
         }
-    }, [])
+    }, [id, history])
+
+    function salvarFilme() {
+        const minhaLista = localStorage.getItem("@primeflix")
+        let filtesSalvos = JSON.parse(minhaLista) || []
+        const hasFilme = filtesSalvos.some((filmesSalvo) => filmesSalvo.id === filme.id)
+
+        if(hasFilme) {
+            alert("Esse filme já está na lista")
+            return
+        }
+
+        filtesSalvos.push(filme);
+        localStorage.setItem("@primeflix", JSON.stringify(filtesSalvos))
+        alert("Filme salvo com sucesso!")
+    }
  
     if(loading) {
         return (
@@ -52,9 +70,9 @@ function Filme() {
             <strong>Avaliação: {filme.vote_average} / 10</strong>
 
             <div className='area-buttons'>
-                <button>Salvar</button>
+                <button onClick={salvarFilme}>Salvar</button>
                 <button>
-                    <a href='#'>
+                    <a target="blank" rel="external" href={`https://youtube.com/results?search_query=${filme.title} trailer`}>
                         Trailer
                     </a>
                 </button>
